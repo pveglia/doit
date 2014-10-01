@@ -507,6 +507,27 @@ class TestRunner_run_tasks(object):
         pytest.raises(SystemExit, my_runner.run_tasks, disp)
         my_runner.finish()
 
+    def test_oldvalues(self, reporter, depfile_name, depfile):
+        def ok(): return {'x':1}
+        t1 = Task('t1', [(ok,)])
+        print t1
+        n1 = ExecNode(t1, None)
+        print n1
+        tasks_dict = {'t1': t1}
+        my_runner = runner.Runner(Dependency, depfile_name, reporter)
+        assert True == my_runner.select_task(n1, tasks_dict)
+        assert hasattr(t1, 'oldvalues')
+        t1_result = my_runner.execute_task(t1)
+        my_runner.process_task_result(n1, t1_result)
+        assert t1.oldvalues == {}
+        t1 = Task('t1', [(ok,)])
+        n1 = ExecNode(t1, None)
+        tasks_dict = {'t1': t1}
+        assert True == my_runner.select_task(n1, tasks_dict)
+        assert hasattr(t1, 'oldvalues')
+        assert t1.oldvalues == {'x': 1}
+
+
 
 @pytest.mark.skipif('not runner.MRunner.available()')
 class TestMReporter(object):

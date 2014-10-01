@@ -89,6 +89,9 @@ class Runner(object):
                 arg_value = get_value(task_id, key_name)
             task.options[arg] = arg_value
 
+    def _get_old_values(self, task, tasks_dict):
+        """get old value from this tasks"""
+        task.oldvalues = self.dep_manager.get_values(task.name)
 
     def select_task(self, node, tasks_dict):
         """Returns bool, task should be executed
@@ -150,6 +153,7 @@ class Runner(object):
             msg = ("ERROR getting value for argument\n" + str(exception))
             self._handle_task_error(node, DependencyError(msg))
             return False
+        self._get_old_values(task, tasks_dict)
 
         return True
 
