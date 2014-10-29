@@ -21,6 +21,15 @@ def first_line(doc):
                 return striped
     return ''
 
+def merge_dict(d1, d2):
+    for k in d2:
+        if k in d1:
+            if isinstance(d1[k], dict) and isinstance(d2[k], dict):
+                merge_dict(d1[k], d2[k])
+            else:
+                d1[k] = d2[k]
+        else:
+            d1[k] = d2[k]
 
 class Task(object):
     """Task
@@ -312,11 +321,11 @@ class Task(object):
             self._action_instances = [create_action(a, self) for a in self._actions]
         return self._action_instances
 
-
     def save_extra_values(self):
         """run value_savers updating self.values"""
         for value_saver in self.value_savers:
-            self.values.update(value_saver())
+            # self.values.update(value_saver())
+            merge_dict(self.values, value_saver())
 
 
     def _get_out_err(self, out, err, verbosity):
